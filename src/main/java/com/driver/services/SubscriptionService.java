@@ -26,36 +26,33 @@ public class SubscriptionService {
     public Integer buySubscription(SubscriptionEntryDto subscriptionEntryDto){
 
         //Save The subscription Object into the Db and return the total Amount that user has to pay
-        Subscription s1=new Subscription();
-        Optional<User> user=userRepository.findById(subscriptionEntryDto.getUserId());
-        if(user.isEmpty())
-        {
-            throw new RuntimeException("User Not found");
-        }
+        User user = userRepository.findById(subscriptionEntryDto.getUserId()).get();
 
-        s1.setUser(user.get());
-        s1.setSubscriptionType(subscriptionEntryDto.getSubscriptionType());
-        s1.setNoOfScreensSubscribed(subscriptionEntryDto.getNoOfScreensRequired());
-        s1.setStartSubscriptionDate(new Date());
+//        return null;
+        Subscription subscription = new Subscription();
+        subscription.setSubscriptionType(subscriptionEntryDto.getSubscriptionType());
+        subscription.setNoOfScreensSubscribed(subscriptionEntryDto.getNoOfScreensRequired());
 
-        int amount=0;
-        if(subscriptionEntryDto.getSubscriptionType().equals(SubscriptionType.BASIC))
-        {
-            amount=500+200*subscriptionEntryDto.getNoOfScreensRequired();
+        SubscriptionType subscriptionType = subscription.getSubscriptionType();
+        int noOfScreen = subscription.getNoOfScreensSubscribed();
+
+        int priceOdSubscription = 0;
+
+        if(subscriptionType.equals(SubscriptionType.BASIC)){
+            priceOdSubscription = 500 + (200 * noOfScreen);
+        }else if(subscriptionType.equals(SubscriptionType.PRO)){
+            priceOdSubscription = 800 + (250 * noOfScreen);
+        }else{
+            priceOdSubscription = 1000 + (350 * noOfScreen);
         }
-        else if(subscriptionEntryDto.getSubscriptionType().equals(SubscriptionType.PRO))
-        {
-            amount=800+250*subscriptionEntryDto.getNoOfScreensRequired();
-        }
-        else{
-            amount=1000+350*subscriptionEntryDto.getNoOfScreensRequired();
-        }
-        s1.setTotalAmountPaid(amount);
-        Subscription subscription=subscriptionRepository.save(s1);
-        User user1=user.get();
-        user1.setSubscription(s1);
-        userRepository.save(user1);
-        return amount;
+        subscription.setTotalAmountPaid(priceOdSubscription);
+        subscription.setUser(user);
+        Date date = new Date();
+        subscription.setStartSubscriptionDate(date);
+
+        user.setSubscription(subscription);
+
+        return subscription.getTotalAmountPaid();
     }
 
     public Integer upgradeSubscription(Integer userId)throws Exception{
@@ -80,9 +77,8 @@ public class SubscriptionService {
             diffOfPrices=newprice-curr;
             s1.setTotalAmountPaid(newprice);
             Subscription s2=subscriptionRepository.save(s1);
-            user.get().setSubscription(s1);
-            userRepository.save(user.get());
-        }
+            user.get().setSubscription(s2);
+           }
         else if(s1.getSubscriptionType().equals(SubscriptionType.PRO))
         {
             s1.setSubscriptionType(SubscriptionType.ELITE);
@@ -92,8 +88,7 @@ public class SubscriptionService {
             diffOfPrices=newprice-curr;
             s1.setTotalAmountPaid(newprice);
             Subscription s2=subscriptionRepository.save(s1);
-            user.get().setSubscription(s1);
-            userRepository.save(user.get());
+            user.get().setSubscription(s2);
             //totalamount to be modified and calculation of difference
         }
         else{
