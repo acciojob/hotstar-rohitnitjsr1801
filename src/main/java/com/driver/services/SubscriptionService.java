@@ -62,13 +62,9 @@ public class SubscriptionService {
         Optional<User> user=userRepository.findById(userId);
         if(user.isEmpty())
         {
-            throw new RuntimeException("User Not found");
+            return 0;
         }
         Optional<Subscription> subscriber=subscriptionRepository.findByUser(user.get());
-        if(subscriber.isEmpty())
-        {
-            throw new RuntimeException("User Not Found");
-        }
         Subscription s1=subscriber.get();
         int diffOfPrices=0;
         if(s1.getSubscriptionType().equals(SubscriptionType.BASIC))
@@ -80,6 +76,7 @@ public class SubscriptionService {
             diffOfPrices=newprice-curr;
             s1.setTotalAmountPaid(newprice);
             Subscription s2=subscriptionRepository.save(s1);
+            user.get().setSubscription(s1);
 
         }
         else if(s1.getSubscriptionType().equals(SubscriptionType.PRO))
@@ -91,6 +88,8 @@ public class SubscriptionService {
             diffOfPrices=newprice-curr;
             s1.setTotalAmountPaid(newprice);
             Subscription s2=subscriptionRepository.save(s1);
+            user.get().setSubscription(s1);
+
             //totalamount to be modified and calculation of difference
         }
         else{
