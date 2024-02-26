@@ -32,6 +32,7 @@ public class SubscriptionService {
         {
             throw new RuntimeException("User Not found");
         }
+
         s1.setUser(user.get());
         s1.setSubscriptionType(subscriptionEntryDto.getSubscriptionType());
         s1.setNoOfScreensSubscribed(subscriptionEntryDto.getNoOfScreensRequired());
@@ -51,8 +52,9 @@ public class SubscriptionService {
         }
         s1.setTotalAmountPaid(amount);
         Subscription subscription=subscriptionRepository.save(s1);
-
-        user.get().setSubscription(subscription);
+        User user1=user.get();
+        user1.setSubscription(s1);
+        userRepository.save(user1);
         return amount;
     }
 
