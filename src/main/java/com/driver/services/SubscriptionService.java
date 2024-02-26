@@ -60,27 +60,41 @@ public class SubscriptionService {
         //If you are already at an ElITE subscription : then throw Exception ("Already the best Subscription")
         //In all other cases just try to upgrade the subscription and tell the difference of price that user has to pay
         //update the subscription in the repository
-        User user= userRepository.findById(userId).get();
-        if(user.getSubscription().getSubscriptionType().equals(SubscriptionType.ELITE)){
+        Optional<User> user=userRepository.findById(userId);
+        if(user.isEmpty())
+        {
+            return 0;
+        }
+        Optional<Subscription> subscriber=subscriptionRepository.findByUser(user.get());
+        Subscription s1=subscriber.get();
+        int diffOfPrices=0;
+        int num=s1.getNoOfScreensSubscribed();
+        int curr=s1.getTotalAmountPaid();
+        if(s1.getSubscriptionType().equals(SubscriptionType.ELITE))
+        {
             throw new Exception("Already the best Subscription");
         }
-
-        Subscription subscription=user.getSubscription();
-        Integer previousFair=subscription.getTotalAmountPaid();
-        Integer currentFair;
-        if(subscription.getSubscriptionType().equals(SubscriptionType.BASIC)){
-            subscription.setSubscriptionType(SubscriptionType.PRO);
-            currentFair =previousFair+300+(50*subscription.getNoOfScreensSubscribed());
-        }else {
-            subscription.setSubscriptionType(SubscriptionType.ELITE);
-            currentFair=previousFair+200+(100*subscription.getNoOfScreensSubscribed());
+        else if(s1.getSubscriptionType().equals(SubscriptionType.BASIC))
+        {
+            s1.setSubscriptionType(SubscriptionType.PRO);
+            int newprice= 800+250*num;
+            diffOfPrices=newprice-curr;
+            s1.setTotalAmountPaid(newprice);
+            user.get().setSubscription(s1);
+            Subscription s2=subscriptionRepository.save(s1);
+           }
+        else if(s1.getSubscriptionType().equals(SubscriptionType.PRO))
+        {
+            s1.setSubscriptionType(SubscriptionType.ELITE);
+            int newprice= 1000+350*num;
+            diffOfPrices=newprice-curr;
+            s1.setTotalAmountPaid(newprice);
+            user.get().setSubscription(s1);
+            Subscription s2=subscriptionRepository.save(s1);
+            //totalamount to be modified and calculation of difference
         }
 
-        subscription.setTotalAmountPaid(currentFair);
-        user.setSubscription(subscription);
-        subscriptionRepository.save(subscription);
-
-        return currentFair-previousFair;
+        return diffOfPrices;
     }
 
     public Integer calculateTotalRevenueOfHotstar(){
