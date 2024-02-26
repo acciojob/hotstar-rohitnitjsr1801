@@ -81,7 +81,7 @@ public class SubscriptionService {
             s1.setTotalAmountPaid(newprice);
             Subscription s2=subscriptionRepository.save(s1);
             user.get().setSubscription(s1);
-
+            userRepository.save(user.get());
         }
         else if(s1.getSubscriptionType().equals(SubscriptionType.PRO))
         {
@@ -93,7 +93,7 @@ public class SubscriptionService {
             s1.setTotalAmountPaid(newprice);
             Subscription s2=subscriptionRepository.save(s1);
             user.get().setSubscription(s1);
-
+            userRepository.save(user.get());
             //totalamount to be modified and calculation of difference
         }
         else{
