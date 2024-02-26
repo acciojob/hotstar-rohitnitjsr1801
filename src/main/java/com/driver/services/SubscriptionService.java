@@ -28,6 +28,10 @@ public class SubscriptionService {
         //Save The subscription Object into the Db and return the total Amount that user has to pay
         Subscription s1=new Subscription();
         Optional<User> user=userRepository.findById(subscriptionEntryDto.getUserId());
+        if(user.isEmpty())
+        {
+            throw new RuntimeException("User Not found");
+        }
         s1.setUser(user.get());
         s1.setSubscriptionType(subscriptionEntryDto.getSubscriptionType());
         s1.setNoOfScreensSubscribed(subscriptionEntryDto.getNoOfScreensRequired());
@@ -56,6 +60,10 @@ public class SubscriptionService {
         //In all other cases just try to upgrade the subscription and tell the difference of price that user has to pay
         //update the subscription in the repository
         Optional<User> user=userRepository.findById(userId);
+        if(user.isEmpty())
+        {
+            throw new RuntimeException("User Not found");
+        }
         Optional<Subscription> subscriber=subscriptionRepository.findByUser(user.get());
         if(subscriber.isEmpty())
         {
