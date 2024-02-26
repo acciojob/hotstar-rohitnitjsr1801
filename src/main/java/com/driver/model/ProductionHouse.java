@@ -1,6 +1,9 @@
 package com.driver.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
+import java.net.SocketOption;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +21,7 @@ public class ProductionHouse {
     private double ratings;
 
     @OneToMany(mappedBy = "productionHouse",cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<WebSeries> webSeriesList;
 
     public ProductionHouse(String name) {

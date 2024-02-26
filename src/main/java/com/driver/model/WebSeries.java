@@ -1,6 +1,8 @@
 package com.driver.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -29,6 +31,7 @@ public class WebSeries {
 
     @ManyToOne
     @JoinColumn
+    @JsonIgnore
     private ProductionHouse productionHouse;
 
     public WebSeries(String seriesName, int ageLimit, double rating, SubscriptionType subscriptionType) {
