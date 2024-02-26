@@ -51,6 +51,8 @@ public class SubscriptionService {
         }
         s1.setTotalAmountPaid(amount);
         Subscription subscription=subscriptionRepository.save(s1);
+
+        user.get().setSubscription(subscription);
         return amount;
     }
 
